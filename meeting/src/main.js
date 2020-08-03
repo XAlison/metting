@@ -3,16 +3,17 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-// import AMap from 'vue-amap';
-// Vue.use(AMap);
+import AMap from 'vue-amap';
+Vue.use(AMap);
 
-// // 初始化vue-amap
-// AMap.initAMapApiLoader({
-//   // 申请的高德key
-//   key: 'aff59bc1b483e9478888cd311442dcdb',
-//   // 插件集合
-//   plugin: ['AMap.PlaceSearch', 'AMap.Geolocation']
-// });
+// 初始化vue-amap
+AMap.initAMapApiLoader({
+  // 申请的高德key
+  key: 'aff59bc1b483e9478888cd311442dcdb',
+  // 插件集合
+  plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor','AMap.Geolocation'],
+  v: '1.4.4'
+});
 
 Vue.config.productionTip = false
 
