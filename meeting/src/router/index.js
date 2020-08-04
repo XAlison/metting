@@ -7,8 +7,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'location',
-      component: () => import('@/views/location')
+      name: 'signIn',
+      component: () => import('@/views/signIn')
     }
   ]
 })

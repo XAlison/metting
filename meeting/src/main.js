@@ -4,6 +4,8 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import AMap from 'vue-amap';
+import { Cell,Icon,Form,Field,Button} from 'vant';
+Vue.use(Cell).use(Icon).use(Form).use(Field).use(Button);
 Vue.use(AMap);
 
 // 初始化vue-amap
@@ -11,7 +13,7 @@ AMap.initAMapApiLoader({
   // 申请的高德key
   key: 'aff59bc1b483e9478888cd311442dcdb',
   // 插件集合
-  plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor','AMap.Geolocation'],
+  plugin: ['AMap.Geolocation'],
   v: '1.4.4'
 });
 

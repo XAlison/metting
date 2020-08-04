@@ -1,26 +1,38 @@
 <template>
-    <!-- 地图容器 -->
-   <div id="map_container">
-    <!-- 地图 -->
-    <el-amap
-        :center="center"
-        :zoom="zoom"
-        class="amap_demo"
-        :plugin="plugin">
-        <!-- 地图标记 -->
-        <el-amap-marker v-for="(marker,index) in markers" :position="marker.position" :key="index"></el-amap-marker>
-    </el-amap>
-</div>
+  <div class="container">
+      <!-- 地图容器 -->
+    <div id="map_container">
+      <!-- 地图 -->
+      <el-amap
+          :center="center"
+          :zoom="zoom"
+          class="amap_demo"
+          :plugin="plugin">
+          <!-- 地图标记 -->
+          <el-amap-marker v-for="(marker,index) in markers" :position="marker.position" :key="index"></el-amap-marker>
+      </el-amap>
+    </div>
+    <div class="toolbar">
+          <span v-if="loaded">
+            location: lng = {{ lng }} lat = {{ lat }}
+          </span>
+        <span v-else>正在定位</span>
+    </div>
+  </div>
 </template>
 
 <style scpoe>
+.container{
+  height: 100%;
+  width: 100%;
+}
 #map_container{
-      width: 100%;
-      height: 100%;
+  width: 100%;
+  height: 100%;
 }
 .amap_demo{
-       width: 100%;
-       height: 100%;
+  width: 100%;
+  height: 100%;
  }
 </style>
 
@@ -29,7 +41,7 @@
     data(){
       const that = this;
       return{
-        zoom: 300000,
+        zoom: 4,
         // 默认中心点
         center: [116.40,39.90],
         // 标记点
@@ -37,6 +49,9 @@
             // 标记点位置
             { position: [116.40,39.90]}
         ],
+        loaded:false,
+        lng:0,
+        lat:0,
         // 当前地图的插件
         plugin: [{
           enableHighAccuracy: true,//是否使用高精度定位，默认:true
@@ -59,10 +74,21 @@
                 if (result && result.position) {
                     // 将当前经纬度给中心点
                     that.center = [result.position.lng, result.position.lat];
+                    that.lng = result.position.lng;
+                    that.lat = result.position.lat;
                     // 将当前经纬度给标记点
-                    that.markers[0].position = that.center;
+                    that.markers[0].position = that.center;                   
                     that.loaded = true;
+                    //向父组件发送地址信息
+                    that.$emit("getLocation",
+                    result.addressComponent.building,
+                    result.addressComponent.province + 
+                    result.addressComponent.city +
+                    result.addressComponent.district +
+                    result.addressComponent.street + 
+                    result.addressComponent.streetNumber)
                     that.$nextTick();
+                    
                 }
               });
             }
