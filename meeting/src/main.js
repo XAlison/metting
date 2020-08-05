@@ -4,9 +4,16 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import AMap from 'vue-amap';
-import { Cell,Icon,Form,Field,Button} from 'vant';
-Vue.use(Cell).use(Icon).use(Form).use(Field).use(Button);
+import { Cell,Icon,Form,Field,Button,Toast} from 'vant';
+import axios from 'axios'
+//axios.defaults.baseURL = "http://localhost:8015"
+//axios.defaults.baseURL = "http://pensionlife.95522.cn/szyl_vote/"
+
+Vue.use(Cell).use(Icon).use(Form).use(Field).use(Button).use(Toast);
 Vue.use(AMap);
+
+Vue.prototype.$axios = axios
+Vue.prototype.$toast = Toast
 
 // 初始化vue-amap
 AMap.initAMapApiLoader({
@@ -16,6 +23,14 @@ AMap.initAMapApiLoader({
   plugin: ['AMap.Geolocation'],
   v: '1.4.4'
 });
+
+router.beforeEach((to, from, next) => {
+  /* 路由发生变化修改页面title */
+  if (to.meta.title) {
+    document.title = to.meta.title
+  }
+  next()
+})
 
 Vue.config.productionTip = false
 
