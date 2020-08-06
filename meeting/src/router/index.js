@@ -5,6 +5,7 @@ Vue.use(Router)
 
 export default new Router({
   //base: "/szyl_vote/meeting/",
+  base: "/meeting/",
   routes: [
     {
       path: '/',
