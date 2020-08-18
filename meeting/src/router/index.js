@@ -4,8 +4,6 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 export default new Router({
-  //base: "/szyl_vote/meeting/",
-  base: "/meeting/",
   routes: [
     {
       path: '/',
@@ -21,6 +19,23 @@ export default new Router({
       component: () => import('@/views/signIn'),
       meta:{
         title: "成员签到页"
+      }
+    }
+    ,
+    {
+      path: '/showQRCode',
+      name: 'ShowQRCode',
+      component: () => import('@/views/ShowQRCode'),
+      meta:{
+        title: "成员签到页"
+      }
+    },
+    {
+      path: '/signSuccess',
+      name: 'signSuccess',
+      component: () => import('@/views/signSuccess'),
+      meta:{
+        title: "签到成功"
       }
     }
   ]

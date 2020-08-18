@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h3>XXX会议</h3>
+    <h3>{{title}}</h3>
     <van-form @submit="onSubmit">
       <van-field class="loc" name="location" @click="refresh">
         <template #input>
@@ -59,8 +59,14 @@ export default {
   components: {
     location: Location,
   },
+  created(){
+    this.title = this.getUrlKey("title");
+    this.meetingId = this.getUrlKey("meetingId")
+  }
+  ,
   data() {
     return {
+      title: "",
       loc: "正在定位...",
       locInfo: "",
       username: "",
@@ -71,7 +77,9 @@ export default {
       isDisabledSMS: false,
       isDisabledSub: false,
       smsTimer: "发送验证码",
-      subText: "立即签到"
+      subText: "立即签到",
+      isSign: false,//是否已签到
+      meetingId: ""//会议id
     };
   },
   methods: {
@@ -100,35 +108,61 @@ export default {
         } 
         this.$toast.loading({
                 forbidClick: true,
-                message: '签到中...',
+                message: '签到中...'
         });
-        //发请求
+        //校验验证码
         this.$axios({
           method: "post",
-          url: "/signIn",
-          data:{
-            "loc": this.loc,
-            "locinfo": this.locInfo,
-            "username": this.username,
-            "empNumber": this.empNumber,
-            "tel": this.tel,
-            "sms": this.sms
+          url: "/checkSms/",
+          data: {
+            "telphone": this.tel,
+            "smsCode": this.sms
           }
         }).then((res)=>{
-          if(res.data.code == "200"){        
-            setTimeout(() => {            
-              this.$toast.clear();
-              this.isDisabledSub = true;
-              this.isDisabledSMS = true;
-              this.subText = "已签到";
-              this.smsTimer = "发送验证码"
-            }, 500);
+          //验证码正确
+          if(res.data.code == "0"){
+            //签到提交
+            this.$axios({
+              method: "post",
+              url: "/signIn/",
+              data:{
+                "loc": this.loc,
+                "locInfo": this.locInfo,
+                "empName": this.username,
+                "empNo": this.empNumber,
+                "telphone": this.tel,
+                "smsCode": this.sms,
+                "meetingId":this.meetingId
+              }
+            }).then((res)=>{
+              if(res.data.code == "200"){ 
+                //this.$toast.clear();    
+                //this.$toast.success("签到成功");  
+                setTimeout(() => { 
+                  this.$toast.clear();                             
+                  this.isSign = true;
+                  this.isDisabledSub = true;
+                  this.isDisabledSMS = true;
+                  this.subText = "已签到";
+                  this.smsTimer = "发送验证码"
+                  this.$dialog.alert({
+                    message: "签到成功！",
+                    width : "250px",
+                    confirmButtonText: "知道了"
+                  })
+                  //this.$router.push("/signSuccess");
+                }, 1000);
+              }else{
+                this.$toast.fail("签到失败")
+              }
+            }).catch((res)=>{
+              this.$toast.fail("签到异常")
+            })
           }else{
-            this.$toast.message = "签到失败"
+            //验证码异常
+            this.$toast.fail(res.data.message);
           }
-        }).catch((res)=>{
-          this.$toast.fail("签到失败")
-        })             
+        })                   
     },
     setLocation(building, info) {
       this.loc = building;
@@ -139,6 +173,7 @@ export default {
       this.locInfo = "";
       this.keyTimer = new Date().getTime();
     },
+    //发送验证码
     sendSMS(){
         if(this.username == ""){
           this.$toast.fail("请填写姓名");
@@ -155,24 +190,31 @@ export default {
             console.log("发送验证码...")
             this.$axios({
               method: "post",
-              url: "/sendSMS",
+              url: "/getSms/",
               data:{
-                "tel":this.tel
+                "telphone":this.tel
               }
             }).then((res)=>{             
-              if(res.data.code == "200"){
+              if(res.data.code == "0"){
                 //按钮禁用
-                this.isDisabled = true;
+                this.isDisabledSMS = true;
                 //开始倒计时60秒var
                 const TIME_COUNT = 60;
                 var count = TIME_COUNT;
                 var temp = setInterval(() => {
-                  if(count>0 && count <=TIME_COUNT){                   
+                  //倒计时，未签到
+                  if(count>0 && count <=TIME_COUNT && !this.isSign){                   
                     this.smsTimer = count +"秒后重发"
                     count--;
-                  }else{
+                  }else if(this.isSign) {
+                    //已签到
                     clearInterval(temp);
-                    this.isDisabled = false;
+                    this.isDisabledSMS = true;
+                    this.smsTimer = "发送验证码";
+                  }else{
+                    //倒计时结束，未签到成功
+                    clearInterval(temp);
+                    this.isDisabledSMS = false;
                     this.smsTimer = "发送验证码";
                   }
                 }, 1000);
@@ -182,7 +224,11 @@ export default {
             })
           }
         }
-      }
+    },
+    // 获取url参数
+    getUrlKey(name) {
+      return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+    }
   }
 }
 </script>

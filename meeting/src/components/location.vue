@@ -70,7 +70,7 @@
             init(o) {
               // o 是高德地图定位插件实例
               o.getCurrentPosition((status, result) => {
-                console.log(result)
+                //console.log(result)
                 if (result && result.position) {
                     // 将当前经纬度给中心点
                     that.center = [result.position.lng, result.position.lat];
@@ -87,8 +87,7 @@
                     result.addressComponent.district +
                     result.addressComponent.street + 
                     result.addressComponent.streetNumber)
-                    that.$nextTick();
-                    
+                    that.$nextTick();                   
                 }
               });
             }

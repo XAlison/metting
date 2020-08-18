@@ -4,29 +4,30 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import AMap from 'vue-amap';
-import { Cell,Icon,Form,Field,Button,Toast,DatetimePicker,Popup} from 'vant';
+import { Cell,CellGroup,Icon,Form,Field,Button,Toast,DatetimePicker,Popup,Dialog} from 'vant';
 import axios from 'axios'
 import Element from 'element-ui'
 import "element-ui/lib/theme-chalk/index.css"
 import '@vant/touch-emulator';
 
-//axios.defaults.baseURL = "http://localhost:8015"
-//axios.defaults.baseURL = "http://pensionlife.95522.cn/szyl_vote/"
-axios.defaults.baseURL = "http://pekka.icu/meeting/"
+//axios.defaults.baseURL = "http://localhost:8016"
+axios.defaults.baseURL = "https://pensionlife.95522.cn/szyl_vote/"
 
 Vue.use(Element)
-Vue.use(Cell).use(Icon).use(Form).use(Field).use(Button).use(Toast).use(DatetimePicker).use(Popup);
+Vue.use(Cell).use(CellGroup).use(Icon).use(Form).use(Field).
+use(Button).use(Toast).use(DatetimePicker).use(Popup).use(Dialog);
 Vue.use(AMap);
 
 Vue.prototype.$axios = axios
 Vue.prototype.$toast = Toast
+Vue.prototype.$dialog = Dialog
 
 // 初始化vue-amap
 AMap.initAMapApiLoader({
   // 申请的高德key
   key: 'aff59bc1b483e9478888cd311442dcdb',
   // 插件集合
-  plugin: ['AMap.Geolocation'],
+  plugin: ['AMap.Geolocation','AMap.Geocoder'],
   v: '1.4.4'
 });
 
