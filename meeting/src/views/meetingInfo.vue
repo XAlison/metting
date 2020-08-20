@@ -40,28 +40,18 @@
             @confirm="confirm2"
           />
         </van-popup>
-        <van-field v-model="empNo" label="员工号" placeholder="请输入您的员工号" />
-        <van-field class="loc" label="会议地点" name="location" @click="refresh" center>
-          <template #input>
-            <van-cell :title="loc" :label="locInfo" center></van-cell>
-          </template>
-        </van-field>
+        <van-field v-model="empName" label="姓名" placeholder="请输入您的姓名" />
+        <van-field v-model="loc" label="会议地点" placeholder="请输入会议地点" />
       </van-cell-group>
     </div>
     <div style="margin: 16px;">
       <van-button round block type="info" @click="getQRCode">获取会议二维码</van-button>
     </div>
-
-    <location v-show="false" @getLocation="setLocation" :key="keyTimer"></location>
   </div>
 </template>
 
 <script>
-import Location from "../components/location.vue";
 export default {
-  components: {
-    location: Location,
-  },
   data() {
     return {
       title: "",
@@ -75,8 +65,7 @@ export default {
       currentDate: new Date(),
       keyTimer: "",
       loc: "",
-      locInfo: "",
-      empNo: ""
+      empName: ""
     };
   },
   methods: {
@@ -123,20 +112,8 @@ export default {
       }
       return `${year}-${month}-${day} ${hour}:${minute}`;
     },
-    setLocation(building, info) {
-      this.loc = building;
-      this.locInfo = info;
-    },
-    refresh() {
-      this.loc = "正在定位...";
-      this.locInfo = "";
-      this.keyTimer = new Date().getTime();
-    },
     getQRCode() {
-      if (this.loc == "正在定位...") {
-        this.$toast.fail("定位未完成");
-        return;
-      } else if (this.title == "") {
+      if (this.title == "") {
         this.$toast.fail("请填写会议标题");
         return;
       } else if (this.startTime == "") {
@@ -148,8 +125,11 @@ export default {
       } else if(this.startTime == this.endTime){
         this.$toast.fail("开始与结束时间不能一致")
         return;
-      } else if(this.empNo == ""){
-          this.$toast.fail("请填写您的员工号")
+      } else if(this.empName == ""){
+          this.$toast.fail("请填写您的姓名")
+        return;
+      }else if(this.loc == ""){
+          this.$toast.fail("请填写会议地点")
         return;
       }
       this.$toast.loading({
@@ -160,12 +140,11 @@ export default {
         method: "post",
         url: "/getQRCode/",
         data: {
-          empNo: this.empNo,
+          empName: this.empName,
           title: this.title,
           startTime: this.startTime,
           endTime: this.endTime,
-          loc: this.loc,
-          locInfo: this.locInfo,
+          loc: this.loc
         },
       })
       .then((res) => {
@@ -175,7 +154,7 @@ export default {
               this.$router.push({
                 path: "/showQRCode",
                 query:{
-                  "empNo":this.empNo,
+                  "empName":this.empName,
                   "title":this.title
                   }
               });

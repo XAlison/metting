@@ -55,13 +55,16 @@
 
 <script>
 import Location from "../components/location.vue";
+import Qs from 'qs'
 export default {
   components: {
     location: Location,
   },
   created(){
     this.title = this.getUrlKey("title");
-    this.meetingId = this.getUrlKey("meetingId")
+    this.meetingId = this.getUrlKey("meetingId");
+    this.startTime = this.getUrlKey("startTime");
+    this.endTime = this.getUrlKey("endTime")
   }
   ,
   data() {
@@ -79,7 +82,9 @@ export default {
       smsTimer: "发送验证码",
       subText: "立即签到",
       isSign: false,//是否已签到
-      meetingId: ""//会议id
+      meetingId: "",//会议id,
+      startTime: "",//签到开始时间
+      endTime: ""//签到结束时间
     };
   },
   methods: {
@@ -121,19 +126,22 @@ export default {
         }).then((res)=>{
           //验证码正确
           if(res.data.code == "0"){
-            //签到提交
-            this.$axios({
-              method: "post",
-              url: "/signIn/",
-              data:{
+            let data = {
                 "loc": this.loc,
                 "locInfo": this.locInfo,
                 "empName": this.username,
                 "empNo": this.empNumber,
                 "telphone": this.tel,
                 "smsCode": this.sms,
-                "meetingId":this.meetingId
+                "meetingId":this.meetingId,
+                "startTime": this.startTime,
+                "endTime": this.endTime
               }
+            //签到提交
+            this.$axios({
+              method: "post",
+              url: "/signIn/",
+              data: Qs.stringify(data)
             }).then((res)=>{
               if(res.data.code == "200"){ 
                 //this.$toast.clear();    
@@ -153,7 +161,7 @@ export default {
                   //this.$router.push("/signSuccess");
                 }, 1000);
               }else{
-                this.$toast.fail("签到失败")
+                this.$toast.fail(res.data.message)
               }
             }).catch((res)=>{
               this.$toast.fail("签到异常")

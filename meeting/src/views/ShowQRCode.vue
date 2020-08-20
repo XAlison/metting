@@ -10,7 +10,7 @@ import BigImg from '../components/imgView.vue'
 export default {
     data(){
         return {
-            empNo:"",
+            empName:"",
             imgSrc:"",
             showImg:"",
             title:""
@@ -20,10 +20,10 @@ export default {
       'big-img': BigImg
     },
     created(){
-        this.empNo = this.$route.query.empNo;
+        this.empName = this.$route.query.empName;
         this.title = this.$route.query.title;
-        this.imgSrc = "./data/qrcodes/"+this.empNo+".jpg"
-        //this.imgSrc = require("../assets/"+this.empNo+".jpg")
+        this.imgSrc = "./data/qrcodes/"+this.empName+".jpg"
+        //this.imgSrc = require("../assets/"+this.empName+".jpg")
     },
     methods: {
       clickImg (e) {
